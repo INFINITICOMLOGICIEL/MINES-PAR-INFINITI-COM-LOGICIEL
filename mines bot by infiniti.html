@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Combinaison aléatoire et notifications</title>
+    <style>
+        /* Styles pour la grille */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(5, 50px);
+            grid-template-rows: repeat(5, 50px);
+            gap: 5px;
+        }
+
+        .cell {
+            background-color: #3498db;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+        }
+
+        .diamond {
+            background-color: #f1c40f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="grid"></div>
+
+    <script>
+        function generateRandomPosition() {
+            return Math.floor(Math.random() * 5) + 1;
+        }
+
+        function generateGrid() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < 25; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                if (Math.random() < 0.1) {
+                    cell.classList.add('diamond');
+                    cell.innerHTML = "💎";
+                } else {
+                    cell.innerHTML = "🟦";
+                }
+
+                const randomPosition = generateRandomPosition();
+                grid.appendChild(cell);
+                grid.style.gridRow = randomPosition;
+                grid.style.gridColumn = randomPosition;
+            }
+
+            // Envoi de la notification
+            const title = 'Nouveau jeu disponible!';
+            const options = {
+                body: 'Jouez à notre nouveau jeu en ligne maintenant!',
+                icon: 'icon.png'
+            };
+
+            if (Notification.permission === 'granted') {
+                new Notification(title, options);
+            }
+        }
+
+        generateGrid();
+        setInterval(generateGrid, 180000); // Mettre à jour toutes les trois minutes
+
+        // Demande d'autorisation pour les notifications
+        if (Notification.permission !== 'granted') {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    console.log('Autorisation accordée pour les notifications.');
+                }
+            });
+        }
+
+        // Configuration PWA pour l'installation sur les écrans d'accueil
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.prompt();
+        });
+    </script>
+</body>
+</html>
